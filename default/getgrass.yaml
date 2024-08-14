@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grass-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grass
+  template:
+    metadata:
+      labels:
+        app: grass
+    spec:
+      containers:
+      - name: grass
+        image: docker.io/nottherealjoe/grass-desktop:grass4.26.5
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: 200m
+          limits:
+            memory: "250Mi"
+            cpu: 300m
+        env:
+        - name: VNC_PASSWORD
+          value: "nasa002getgrass"
+        - name: GRASS_USERNAME
+          value: "nasa002"
+        - name: GRASS_PASSWORD
+          value: "c2.R#9iBeeVP^_q"
+        ports:
+        - containerPort: 5900
+          protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grass-service
+spec:
+  selector:
+    app: grass
+  ports:
+  - protocol: TCP
+    port: 5900
+    targetPort: 5900
+  type: ClusterIP
