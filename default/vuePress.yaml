@@ -1,0 +1,59 @@
+# Kubernetes deployment definition
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vuepress-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vuepress
+  template:
+    metadata:
+      labels:
+        app: vuepress
+    spec:
+      containers:
+        - name: vuepress
+          image: evilharry1024/notebook:v0.0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: 100m
+            limits:
+              memory: "200Mi"
+              cpu: "100m"
+---
+## Kubernetes service definition
+apiVersion: v1
+kind: Service
+metadata:
+  name: vuepress-service
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: vuepress
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vuepress-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: nasa1024.q-wifi.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: vuepress-service
+                port:
+                  number: 80
